@@ -6,180 +6,212 @@
     <title>KOSPI 50 종합 투자사이클 대시보드</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-blue: #38bdf8;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --red: #ef4444;
-            --blue: #3b82f6;
-            --border: #334155;
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-blue: #58a6ff;
+            --text-main: #c9d1d9;
+            --text-sub: #8b949e;
+            --border: #30363d;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg-color); color: var(--text-main); padding: 20px; line-height: 1.5; }
-        
-        /* Header & Dashboard Grid */
-        header { text-align: center; margin-bottom: 25px; }
-        header h1 { font-size: 26px; color: var(--accent-blue); margin-bottom: 6px; }
-        header p { color: var(--text-sub); font-size: 14px; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            background: var(--bg-color); 
+            color: var(--text-main); 
+            padding: 15px; 
+            line-height: 1.5; 
+        }
 
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; max-width: 1400px; margin: 0 auto; }
-        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        /* 헤더 디자인 */
+        header { text-align: center; margin-bottom: 20px; padding: 10px 0; }
+        header h1 { font-size: 24px; color: var(--accent-blue); margin-bottom: 6px; }
+        header p { color: var(--text-sub); font-size: 13px; }
 
-        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .card-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        /* 대시보드 그리드 레이아웃 */
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 2fr; 
+            gap: 15px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+        @media (max-width: 992px) { 
+            .dashboard-grid { grid-template-columns: 1fr; } 
+        }
 
-        /* KCI Score Box */
-        .kci-box { text-align: center; padding: 15px 0; }
-        .kci-score { font-size: 42px; font-weight: 800; color: var(--accent-blue); }
-        .kci-status { display: inline-block; padding: 6px 16px; border-radius: 20px; font-weight: 700; margin-top: 10px; font-size: 14px; background: #065f46; color: #a7f3d0; }
+        /* 카드 컨테이너 */
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 10px; 
+            padding: 15px; 
+            border: 1px solid var(--border); 
+            margin-bottom: 15px; 
+        }
+        .card-title { 
+            font-size: 15px; 
+            font-weight: 600; 
+            margin-bottom: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 8px; 
+            color: #f0f6fc;
+        }
 
-        /* Market Investor Supply */
-        .investor-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
-        .investor-card { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
-        .investor-card .title { font-size: 12px; color: var(--text-sub); }
-        .investor-card .value { font-size: 15px; font-weight: 700; margin-top: 4px; }
-        .plus { color: var(--red); }
-        .minus { color: var(--blue); }
+        /* KCI 스코어 박스 */
+        .kci-box { text-align: center; padding: 10px 0; }
+        .kci-score { font-size: 38px; font-weight: 800; color: var(--accent-blue); }
+        .kci-status { 
+            display: inline-block; 
+            padding: 5px 14px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: 700; 
+            background: #238636; 
+            color: #ffffff; 
+            margin-top: 8px; 
+        }
 
-        /* KOSPI 50 Stock Table */
-        .table-container { max-height: 520px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-        th { background: #0f172a; position: sticky; top: 0; padding: 10px; color: var(--text-sub); border-bottom: 1px solid var(--border); }
-        td { padding: 10px; border-bottom: 1px solid var(--border); }
-        tr:hover { background: #334155; cursor: pointer; }
-
-        /* TradingView Chart Frame */
-        .chart-container { height: 500px; border-radius: 8px; overflow: hidden; }
+        .widget-container { width: 100%; border-radius: 8px; overflow: hidden; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>📊 KOSPI 50 투자사이클 & 글로벌 종합 대시보드</h1>
-        <p>실시간 기술적 지표, 거시경제 수급, KOSPI 시가총액 상위 종목 통합 모니터링</p>
+        <h1>📊 코스피 투자사이클 & 글로벌 종합 대시보드</h1>
+        <p>거시경제, 실시간 수급 동향, KOSPI 시가총액 상위 종목 통합 모니터링</p>
     </header>
 
     <div class="dashboard-grid">
-        <!-- 좌측: 지수 및 수급 현황 -->
+        <!-- 좌측 패널: KCI 지수 + 실시간 수급/시세 리스트 -->
         <div class="left-panel">
+            
             <!-- 1. 코스피 투자사이클 지수 (KCI) -->
             <div class="card">
                 <div class="card-title">
                     <span>💡 코스피 투자사이클 지수 (KCI)</span>
-                    <span style="font-size: 12px; color: var(--text-sub);">실시간 반영</span>
+                    <span style="font-size: 11px; color: var(--text-sub);">실시간 분석</span>
                 </div>
                 <div class="kci-box">
-                    <div class="kci-score" id="kci-val">68.5 <span style="font-size:20px;">/ 100</span></div>
+                    <div class="kci-score">68.5 <span style="font-size:18px;">/ 100</span></div>
                     <div class="kci-status">🟢 분할 매수 (Buy)</div>
                 </div>
             </div>
 
-            <!-- 2. 오늘 시장 주체별 수급 (개인/외국인/기관) -->
+            <!-- 2. 시장 종합 수급 & 한국 주요 지수 (트레이딩뷰 라이브 위젯) -->
             <div class="card">
-                <div class="card-title"><span>📈 오늘 증시 투자주체별 수급</span></div>
-                <div class="investor-grid">
-                    <div class="investor-card">
-                        <div class="title">개인</div>
-                        <div class="value minus">-2,450억</div>
-                    </div>
-                    <div class="investor-card">
-                        <div class="title">외국인</div>
-                        <div class="value plus">+1,820억</div>
-                    </div>
-                    <div class="investor-card">
-                        <div class="title">기관</div>
-                        <div class="value plus">+630억</div>
+                <div class="card-title">📈 KOSPI / KOSDAQ / 환율 실시간 시세</div>
+                <div class="widget-container">
+                    <div class="tradingview-widget-container">
+                        <div class="tradingview-widget-container__widget"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+                        {
+                            "colorTheme": "dark",
+                            "dateRange": "1D",
+                            "showChart": false,
+                            "locale": "kr",
+                            "width": "100%",
+                            "height": "170",
+                            "isTransparent": true,
+                            "tabs": [
+                                {
+                                    "title": "증시 & 환율",
+                                    "symbols": [
+                                        { "s": "KRX:KOSPI", "d": "코스피" },
+                                        { "s": "KRX:KOSDAQ", "d": "코스닥" },
+                                        { "s": "FX_IDC:USDKRW", "d": "원/달러 환율" }
+                                    ]
+                                }
+                            ]
+                        }
+                        </script>
                     </div>
                 </div>
             </div>
 
-            <!-- 3. KOSPI 50 주요 종목 실시간 리스트 -->
+            <!-- 3. KOSPI 시가총액 상위 종목 실시간 스크리너 -->
             <div class="card">
-                <div class="card-title"><span>🇰🇷 KOSPI 시가총액 상위 종목</span></div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>종목명</th>
-                                <th>현재가</th>
-                                <th>등락률</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stock-list">
-                            <!-- JS 자동 생성 -->
-                        </tbody>
-                    </table>
+                <div class="card-title">🇰🇷 KOSPI 주요 대형주 실시간 시세</div>
+                <div class="widget-container">
+                    <div class="tradingview-widget-container">
+                        <div class="tradingview-widget-container__widget"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+                        {
+                            "colorTheme": "dark",
+                            "dateRange": "12M",
+                            "showChart": false,
+                            "locale": "kr",
+                            "width": "100%",
+                            "height": "430",
+                            "isTransparent": true,
+                            "showSymbolLogo": true,
+                            "tabs": [
+                                {
+                                    "title": "KOSPI 시총 상위",
+                                    "symbols": [
+                                        { "s": "KRX:005930", "d": "삼성전자" },
+                                        { "s": "KRX:000660", "d": "SK하이닉스" },
+                                        { "s": "KRX:373220", "d": "LG에너지솔루션" },
+                                        { "s": "KRX:207940", "d": "삼성바이오로직스" },
+                                        { "s": "KRX:005380", "d": "현대차" },
+                                        { "s": "KRX:000270", "d": "기아" },
+                                        { "s": "KRX:068270", "d": "셀트리온" },
+                                        { "s": "KRX:105560", "d": "KB금융" },
+                                        { "s": "KRX:035420", "d": "NAVER" },
+                                        { "s": "KRX:055550", "d": "신한지주" },
+                                        { "s": "KRX:005490", "d": "POSCO홀딩스" },
+                                        { "s": "KRX:012330", "d": "현대모비스" }
+                                    ]
+                                }
+                            ]
+                        }
+                        </script>
+                    </div>
                 </div>
             </div>
+
         </div>
 
-        <!-- 우측: 대형 차트 및 거시경제 지표 -->
+        <!-- 우측 패널: 인터랙티브 실시간 종합 차트 및 매매 신호 분석 -->
         <div class="right-panel">
-            <!-- 1. 메인 차트 (TradingView) -->
+            
+            <!-- 1. 트레이딩뷰 메인 캔들 차트 (KOSPI & 종목 조회 가능) -->
             <div class="card">
-                <div class="card-title"><span>📉 KOSPI / 환율 / 반도체 실시간 차트</span></div>
-                <div class="chart-container" id="tv-chart">
-                    <!-- TradingView Widget Embed -->
+                <div class="card-title">📉 KOSPI 실시간 종합 차트 (지표/종목 변경 가능)</div>
+                <div id="tv-chart" style="height: 500px; width: 100%;"></div>
+            </div>
+
+            <!-- 2. 매매 테크니컬 분석 (실시간 매수/매도 시그널 게이지) -->
+            <div class="card">
+                <div class="card-title">⚙️ KOSPI 실시간 기술적 분석 시그널</div>
+                <div class="widget-container">
+                    <div class="tradingview-widget-container">
+                        <div class="tradingview-widget-container__widget"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
+                        {
+                            "interval": "1D",
+                            "width": "100%",
+                            "isTransparent": true,
+                            "height": "280",
+                            "symbol": "KRX:KOSPI",
+                            "showIntervalTabs": true,
+                            "displayMode": "single",
+                            "locale": "kr",
+                            "colorTheme": "dark"
+                        }
+                        </script>
+                    </div>
                 </div>
             </div>
 
-            <!-- 2. 거시경제 지표 모니터 -->
-            <div class="card">
-                <div class="card-title"><span>🌐 거시경제 & 지정학 핵심 지표</span></div>
-                <div class="investor-grid">
-                    <div class="investor-card">
-                        <div class="title">원/달러 환율</div>
-                        <div class="value">1,335.50원</div>
-                    </div>
-                    <div class="investor-card">
-                        <div class="title">미 10년물 국채</div>
-                        <div class="value">3.85%</div>
-                    </div>
-                    <div class="investor-card">
-                        <div class="title">WTI 유가</div>
-                        <div class="value">$72.40</div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- TradingView Widget Script -->
+    <!-- TradingView 메인 차트 엔진 스크립트 -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // 1. KOSPI 50 주요 종목 샘플 데이터 및 생성
-        const top50Stocks = [
-            { name: "삼성전자", price: "74,500", change: "+1.22%", up: true },
-            { name: "SK하이닉스", price: "172,000", change: "+2.85%", up: true },
-            { name: "LG에너지솔루션", price: "385,000", change: "-0.65%", up: false },
-            { name: "삼성바이오로직스", price: "980,000", change: "+0.10%", up: true },
-            { name: "현대차", price: "245,000", change: "+1.87%", up: true },
-            { name: "기아", price: "105,200", change: "+0.96%", up: true },
-            { name: "셀트리온", price: "192,400", change: "-1.12%", up: false },
-            { name: "KB금융", price: "84,500", change: "+2.15%", up: true },
-            { name: "NAVER", price: "175,000", change: "-0.40%", up: false },
-            { name: "신한지주", price: "52,300", change: "+1.45%", up: true },
-            { name: "POSCO홀딩스", price: "365,000", change: "-0.82%", up: false },
-            { name: "현대모비스", price: "230,000", change: "+0.50%", up: true },
-            { name: "삼성물산", price: "142,000", change: "+0.20%", up: true },
-            { name: "카카오", price: "39,800", change: "-1.80%", up: false },
-            { name: "LG화학", price: "310,000", change: "-0.95%", up: false }
-        ];
-
-        const stockTbody = document.getElementById('stock-list');
-        top50Stocks.forEach(stock => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><b>${stock.name}</b></td>
-                <td>${stock.price}원</td>
-                <td class="${stock.up ? 'plus' : 'minus'}">${stock.change}</td>
-            `;
-            stockTbody.appendChild(tr);
-        });
-
-        // 2. TradingView 실시간 종합 차트 탑재
         new TradingView.widget({
             "autosize": true,
             "symbol": "KRX:KOSPI",
