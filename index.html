@@ -4,15 +4,11 @@ import yfinance as yf
 import requests
 
 def get_kospi50_pbr():
-    """
-    네이버 증권 등에서 KOSPI 50 주요 기업의 PBR/PER 데이터를 크롤링하거나
-    대표 지수(KOSPI 200 / KOSPI 50 ETF) 데이터를 추정 산출
-    """
-    # yfinance를 활용한 KOSPI 대표 지수 추적
+    """ 네이버 증권 등에서 KOSPI 50 주요 기업의 PBR/PER 데이터를 크롤링하거나 대표 지수 추정 산출 """
     kospi = yf.Ticker("^KS11")
     df = kospi.history(period="5y")
     
-    # 200일 이동평균선 대비 격차(이격도) 기반 저평가도 계산 (예시)
+    # 200일 이동평균선 대비 격차(이격도) 기반 저평가도 계산
     df['MA200'] = df['Close'].rolling(window=200).mean()
     df['Disparity'] = (df['Close'] / df['MA200']) * 100
     
@@ -23,9 +19,7 @@ def get_kospi50_pbr():
     return val_score
 
 def get_macro_score():
-    """
-    거시경제 지표: 환율, 유가, 미 금리
-    """
+    """ 거시경제 지표: 환율, 유가, 미 금리 """
     tickers = {
         'usdkrw': 'KRW=X',      # 원/달러 환율
         'us10y': '^TNX',        # 미 10년물 국채금리
@@ -33,7 +27,7 @@ def get_macro_score():
     }
     data = yf.download(list(tickers.values()), period="1y")['Close']
     
-    # 환율 상승(원화 약세)시 한국 증시 부담 -> 환율 52주 위치 스코어화
+    # 환율 52주 위치 스코어화
     krw = data['KRW=X'].dropna()
     krw_min, krw_max = krw.min(), krw.max()
     krw_score = 100 - ((krw.iloc[-1] - krw_min) / (krw_max - krw_min) * 100)
