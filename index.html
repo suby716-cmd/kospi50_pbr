@@ -1,0 +1,75 @@
+import pandas as pd
+import numpy as np
+import yfinance as yf
+import requests
+
+def get_kospi50_pbr():
+    """
+    네이버 증권 등에서 KOSPI 50 주요 기업의 PBR/PER 데이터를 크롤링하거나
+    대표 지수(KOSPI 200 / KOSPI 50 ETF) 데이터를 추정 산출
+    """
+    # yfinance를 활용한 KOSPI 대표 지수 추적
+    kospi = yf.Ticker("^KS11")
+    df = kospi.history(period="5y")
+    
+    # 200일 이동평균선 대비 격차(이격도) 기반 저평가도 계산 (예시)
+    df['MA200'] = df['Close'].rolling(window=200).mean()
+    df['Disparity'] = (df['Close'] / df['MA200']) * 100
+    
+    current_disparity = df['Disparity'].iloc[-1]
+    
+    # 이격도가 85 이하이면 100점(극도 저평가), 115 이상이면 0점(극도 과열)
+    val_score = np.clip((115 - current_disparity) / (115 - 85) * 100, 0, 100)
+    return val_score
+
+def get_macro_score():
+    """
+    거시경제 지표: 환율, 유가, 미 금리
+    """
+    tickers = {
+        'usdkrw': 'KRW=X',      # 원/달러 환율
+        'us10y': '^TNX',        # 미 10년물 국채금리
+        'sox': '^SOX'           # 필라델피아 반도체 지수
+    }
+    data = yf.download(list(tickers.values()), period="1y")['Close']
+    
+    # 환율 상승(원화 약세)시 한국 증시 부담 -> 환율 52주 위치 스코어화
+    krw = data['KRW=X'].dropna()
+    krw_min, krw_max = krw.min(), krw.max()
+    krw_score = 100 - ((krw.iloc[-1] - krw_min) / (krw_max - krw_min) * 100)
+    
+    # 반도체 지수(SOX) 모멘텀
+    sox = data['^SOX'].dropna()
+    sox_ma200 = sox.rolling(200).mean().iloc[-1]
+    sox_score = np.clip((sox.iloc[-1] / sox_ma200) * 50, 0, 100)
+    
+    macro_score = (krw_score * 0.5) + (sox_score * 0.5)
+    return macro_score
+
+def calculate_kospi_cycle_index():
+    val_score = get_kospi50_pbr()
+    macro_score = get_macro_score()
+    
+    # 가중치 반영
+    kci = (val_score * 0.6) + (macro_score * 0.4)
+    
+    print(f"=== 코스피 투자사이클 지수(KCI) 분석 결과 ===")
+    print(f"밸류에이션 점수 : {val_score:.1f} / 100")
+    print(f"거시경제/지정학 점수 : {macro_score:.1f} / 100")
+    print(f"종합 KCI 지수     : {kci:.1f} / 100")
+    
+    if kci >= 80:
+        signal = "🔵 강력 매수 (Strong Buy)"
+    elif kci >= 60:
+        signal = "🟢 분할 매수 (Buy)"
+    elif kci >= 40:
+        signal = "🟡 중립/관망 (Hold)"
+    elif kci >= 20:
+        signal = "🟠 매도 우위 (Sell)"
+    else:
+        signal = "🔴 강력 매도 (Strong Sell)"
+        
+    print(f"현재 투자 판단   : {signal}")
+
+# 실행
+calculate_kospi_cycle_index()
