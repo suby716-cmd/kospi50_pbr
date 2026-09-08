@@ -22,7 +22,7 @@ header{display:flex;justify-content:space-between;gap:20px;align-items:flex-star
 .badge{display:inline-flex;padding:3px 7px;border-radius:999px;font-size:10px;border:1px solid #2a425c}.bgreen{color:var(--green);border-color:rgba(104,223,160,.3);background:rgba(104,223,160,.08)}.bamber{color:var(--amber);border-color:rgba(244,191,97,.3);background:rgba(244,191,97,.08)}.bred{color:var(--red);border-color:rgba(255,116,134,.3);background:rgba(255,116,134,.08)}
 .rankings{display:grid;gap:8px}.rank-row{display:grid;grid-template-columns:28px 1fr 55px 68px;gap:8px;align-items:center;padding:9px 10px;background:rgba(7,18,31,.5);border:1px solid #1e344d;border-radius:10px}.rank-row .r{font:11px 'DM Mono';color:#7890a9}.rank-row .s{font:700 12px 'DM Mono';text-align:right}.rank-row .a{text-align:right;font-size:11px}
 .tv{height:430px;border-radius:11px;overflow:hidden;background:#081624}.footer{margin-top:25px;border-top:1px solid var(--line);padding-top:15px;color:#70869e;font-size:10px}.source a{color:#8eb0d4}
-@media(max-width:1000px){.hero{grid-template-columns:1fr}.span8,.span4,.span6{grid-column:span 12}}@media(max-width:600px){.wrap{padding:17px 12px 45px}header{display:block}.top{margin-top:12px;justify-content:space-between}.signal{gap:12px}.score{font-size:70px}.signal-title{font-size:19px}}
+.detail-empty{padding:28px;color:var(--muted);text-align:center;border:1px dashed #2a4058;border-radius:12px}.detail-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.detail-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:14px}.detail-name{font-size:22px;font-weight:800}.detail-price{font:600 28px 'DM Mono'}.detail-change{font:600 15px 'DM Mono';margin-left:8px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.metric{background:#0d2035;border:1px solid #1c3650;border-radius:11px;padding:11px}.metric b{display:block;font:700 16px 'DM Mono';margin-top:5px}.metric small{color:var(--muted);font-size:10px}.reason-list{display:grid;gap:8px}.reason{display:flex;justify-content:space-between;padding:10px 11px;background:#0d2035;border:1px solid #1c3650;border-radius:10px;font-size:12px}.reason b{font-family:'DM Mono'}.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mini{background:#0d2035;border:1px solid #1c3650;border-radius:11px;padding:11px}.mini small{display:block;color:var(--muted);font-size:10px}.mini b{font:700 16px 'DM Mono';display:block;margin-top:5px}@media(max-width:700px){.metrics{grid-template-columns:1fr 1fr}.detail-grid{grid-template-columns:1fr}}@media(max-width:1000px){.hero{grid-template-columns:1fr}.span8,.span4,.span6{grid-column:span 12}}@media(max-width:600px){.wrap{padding:17px 12px 45px}header{display:block}.top{margin-top:12px;justify-content:space-between}.signal{gap:12px}.score{font-size:70px}.signal-title{font-size:19px}}
 </style>
 </head>
 <body>
@@ -67,12 +67,14 @@ header{display:flex;justify-content:space-between;gap:20px;align-items:flex-star
 </section>
 
 <section class="card span8">
-  <div class="label"><div><h2 class="section-title">한국시장 차트</h2><p class="section-note">코스피 종합지수 · KRX:KOSPI</p></div><span class="pill">KOSPI</span></div>
-  <div id="tv" class="tv"></div>
+  <div class="label"><div><h2 class="section-title">선택 종목 정밀분석</h2><p class="section-note">종목을 클릭하면 추세·RSI·MACD·52주 위치·밸류에이션을 함께 계산합니다.</p></div><span id="detailStatus" class="pill warn">종목 선택</span></div>
+  <div id="detail" class="detail-empty">아래 종목표에서 종목을 클릭해 주세요.</div>
 </section>
 
 <section class="card span4">
-  <div class="label"><div><h2 class="section-title">모델 설명</h2><p class="section-note">판단지수는 한 가지 지표에 의존하지 않습니다.</p></div></div>
+  <div class="label"><div><h2 class="section-title">시장 판단 레이더</h2><p class="section-note">현재 시세 + 기술적 지표를 단계적으로 반영합니다.</p></div></div>
+  <div id="marketMini" class="mini-grid"></div>
+  <div class="label" style="margin-top:18px"><div><h2 class="section-title">모델 설명</h2><p class="section-note">판단지수는 한 가지 지표에 의존하지 않습니다.</p></div></div>
   <div class="factor-list">
     <div class="factor"><span>가격 모멘텀<small>당일 등락률</small></span><span class="bar"><i style="width:30%;background:var(--cyan)"></i></span><span class="num">30%</span></div>
     <div class="factor"><span>시장 breadth<small>상승 종목 비율</small></span><span class="bar"><i style="width:25%;background:var(--cyan)"></i></span><span class="num">25%</span></div>
@@ -84,8 +86,7 @@ header{display:flex;justify-content:space-between;gap:20px;align-items:flex-star
 </section>
 </main>
 <footer class="footer">
-  <b>Korea Stock Compass</b> · 시세: 네이버 금융 실시간 중계 · 차트: TradingView KRX:KOSPI
-  <span class="source">차트: <a href="https://www.tradingview.com/" target="_blank" rel="noreferrer">TradingView</a></span>
+  <b>Korea Stock Compass</b> · 시세: 네이버 금융 실시간 중계 · 기술지표: 일봉 데이터 계산
 </footer>
 </div>
 
@@ -128,8 +129,9 @@ function render(){
  arr.sort((a,b)=>so==='chg'?(b.change||-999)-(a.change||-999):so==='name'?a.name.localeCompare(b.name,'ko'):so==='rank'?a.rank-b.rank:(b.score||0)-(a.score||0));
  $('#rows').innerHTML=arr.map(s=>{
   const a=action(s.score), c=cls(a);
-  return `<tr><td class="rank">${s.rank}</td><td><div class="name">${esc(s.name)}</div><div class="ticker">${s.code}</div></td><td class="price">${fmtPrice(s.price)}</td><td class="chg ${s.change>0?'up':s.change<0?'down':'flat'}">${fmtPct(s.change)}</td><td>${fmtAmt(s.amount)}</td><td>${s.change==null?'—':(s.change>=1?'강함':s.change<=-1?'약함':'중립')}</td><td>${s.change==null?'—':(s.change>=2?'상승':s.change<=-2?'하락':'혼조')}</td><td class="score-cell ${c}">${s.score}</td><td class="action ${c}">${a}</td></tr>`;
+  return `<tr data-code="${s.code}" class="stock-row"><td class="rank">${s.rank}</td><td><div class="name">${esc(s.name)}</div><div class="ticker">${s.code}</div></td><td class="price">${fmtPrice(s.price)}</td><td class="chg ${s.change>0?'up':s.change<0?'down':'flat'}">${fmtPct(s.change)}</td><td>${fmtAmt(s.amount)}</td><td>${s.change==null?'—':(s.change>=1?'강함':s.change<=-1?'약함':'중립')}</td><td>${s.change==null?'—':(s.change>=2?'상승':s.change<=-2?'하락':'혼조')}</td><td class="score-cell ${c}">${s.score}</td><td class="action ${c}">${a}</td></tr>`;
  }).join('')||'<tr><td colspan="9" style="text-align:center;padding:25px;color:#8da4bd">조건에 맞는 종목이 없습니다.</td></tr>';
+ document.querySelectorAll('.stock-row').forEach(r=>r.onclick=()=>loadDetail(r.dataset.code));
 
  const top=[...data].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,10);
  $('#rankings').innerHTML=top.map((s,i)=>`<div class="rank-row"><span class="r">${String(i+1).padStart(2,'0')}</span><span><b>${esc(s.name)}</b><small class="ticker"> ${s.code}</small></span><span class="s">${s.score??'—'}</span><span class="a ${cls(action(s.score||50))}">${action(s.score||50)}</span></div>`).join('');
@@ -148,6 +150,7 @@ function render(){
   ['변동성','급등락 위험',valid.length?Math.max(0,100-Math.abs(avg)*18):50,15],
   ['리더십','상위 종목 동조화',valid.length?60:50,10]
  ].map(x=>`<div class="factor"><span>${x[0]}<small>${x[1]} · ${x[3]}%</small></span><span class="bar"><i style="width:${x[2]}%;background:${x[2]>=65?'var(--green)':x[2]<=40?'var(--red)':'var(--amber)'}"></i></span><span class="num">${Math.round(x[2])}</span></div>`).join('');
+ $('#marketMini').innerHTML=`<div class="mini"><small>상승 종목</small><b>${valid.length?up+' / '+valid.length:'—'}</b></div><div class="mini"><small>평균 등락률</small><b>${valid.length?fmtPct(avg):'—'}</b></div><div class="mini"><small>시장 분위기</small><b>${valid.length?(breadth>=65?'강세':breadth<=35?'약세':'혼조'):'—'}</b></div><div class="mini"><small>데이터 상태</small><b>${valid.length?'LIVE':'대기'}</b></div>`;
 }
 async function loadQuotes(){
  $('#status').textContent='시세 업데이트 중…';
@@ -166,27 +169,24 @@ async function loadQuotes(){
  }
  render();$('#time').textContent=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
-function tradingview(){
- const s=document.createElement('script');
- s.src='https://s3.tradingview.com/tv.js';
- s.onload=()=>new TradingView.widget({
-   autosize:true,
-   symbol:'KRX:KOSPI',
-   interval:'15',
-   timezone:'Asia/Seoul',
-   theme:'dark',
-   style:'1',
-   locale:'kr',
-   enable_publishing:false,
-   allow_symbol_change:false,
-   hide_top_toolbar:false,
-   hide_legend:false,
-   container_id:'tv'
- });
- document.head.appendChild(s);
+async function loadDetail(code){
+ const s=data.find(x=>x.code===code); if(!s)return;
+ $('#detailStatus').textContent=`${s.name} 분석 중`;
+ $('#detail').innerHTML='<div class="detail-empty">기술지표와 밸류에이션을 계산하는 중입니다…</div>';
+ try{
+  const r=await fetch(`${API_BASE}/detail?code=${code}`,{cache:'no-store'}); if(!r.ok)throw Error(r.status);
+  const j=await r.json(); const q=j.quote||s, m=j.metrics||{};
+  const score=j.score??s.score??50, a=action(score), c=cls(a);
+  $('#detailStatus').textContent=`${a} · ${score}점`;
+  $('#detailStatus').className='pill '+(c==='sell'?'danger':c==='watch'?'warn':'');
+  const pct=v=>v==null?'—':(Number(v)>0?'+':'')+Number(v).toFixed(2)+'%';
+  const n=v=>v==null?'—':Number(v).toLocaleString('ko-KR');
+  const val=v=>v==null?'—':Number(v).toFixed(2);
+  $('#detail').innerHTML=`<div class="detail-head"><div><div class="detail-name">${esc(s.name)} <span class="ticker">${s.code}</span></div><div class="ticker">${m.exchange||'KOSPI'} · ${m.updatedAt||''}</div></div><div><span class="detail-price">${n(q.price)}원</span><span class="detail-change ${q.change>=0?'up':'down'}">${pct(q.change)}</span></div></div><div class="metrics"><div class="metric"><small>5일 수익률</small><b>${pct(m.ret5)}</b></div><div class="metric"><small>20일 수익률</small><b>${pct(m.ret20)}</b></div><div class="metric"><small>RSI(14)</small><b>${val(m.rsi14)}</b></div><div class="metric"><small>MACD</small><b>${m.macdSignal||'—'}</b></div><div class="metric"><small>MA5 / MA20</small><b>${n(m.ma5)} / ${n(m.ma20)}</b></div><div class="metric"><small>52주 위치</small><b>${m.week52Pos==null?'—':m.week52Pos.toFixed(0)+'%'}</b></div><div class="metric"><small>PER / PBR</small><b>${val(m.per)} / ${val(m.pbr)}</b></div><div class="metric"><small>외국인 보유율</small><b>${pct(m.foreignRate)}</b></div></div><div class="detail-grid" style="margin-top:14px"><div class="reason-list"><div class="reason"><span>추세</span><b>${m.trend||'—'}</b></div><div class="reason"><span>거래대금</span><b>${fmtAmt(q.amount)}</b></div><div class="reason"><span>밸류에이션</span><b>${m.valuation||'—'}</b></div><div class="reason"><span>종합 판단</span><b class="${c}">${a}</b></div></div><div class="reason-list"><div class="reason"><span>판단점수</span><b>${score}/100</b></div><div class="reason"><span>단기 모멘텀</span><b>${m.momentum||'—'}</b></div><div class="reason"><span>52주 고가 / 저가</span><b>${n(m.high52)} / ${n(m.low52)}</b></div><div class="reason"><span>분석 근거</span><b>${m.reason||'시세 데이터 부족'}</b></div></div></div>`;
+ }catch(e){ $('#detailStatus').textContent='분석 실패'; $('#detailStatus').className='pill danger'; $('#detail').innerHTML='<div class="detail-empty">정밀분석 데이터를 불러오지 못했습니다. 기본 현재가 데이터는 계속 표시됩니다.</div>'; }
 }
 $('#refresh').onclick=loadQuotes;$('#search').oninput=render;$('#filter').onchange=render;$('#sort').onchange=render;
-render();tradingview();loadQuotes();setInterval(loadQuotes,30000);
+render();loadQuotes();setInterval(loadQuotes,60000);
 </script>
 </body>
 </html>
