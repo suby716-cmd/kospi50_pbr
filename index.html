@@ -1,199 +1,234 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="한국 상위 50개 종목 투자판단 참고용 실시간 대시보드">
-<title>KOSPI 50 · Korea Stock Compass</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#07111e;--panel:#0d1b2d;--panel2:#11243b;--line:#203650;--text:#edf5ff;--muted:#8da4bd;--cyan:#55d6d0;--green:#68dfa0;--amber:#f4bf61;--red:#ff7486;--blue:#79a9ff;--shadow:0 18px 55px rgba(0,0,0,.25)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 85% -10%,#183c58 0,transparent 32%),var(--bg);color:var(--text);font-family:'IBM Plex Sans KR',sans-serif;line-height:1.5}
-button,select,input{font:inherit;color:inherit}.wrap{max-width:1500px;margin:auto;padding:24px 28px 60px}
-header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin:10px 0 24px}.eyebrow{font:500 11px 'DM Mono';color:var(--cyan);letter-spacing:.12em}.brand{font-size:clamp(28px,4vw,48px);font-weight:700;letter-spacing:-.06em;margin:4px 0}.sub{color:var(--muted);font-size:13px}.top{display:flex;gap:9px;align-items:center}.status{color:var(--muted);font:11px 'DM Mono';display:flex;gap:7px;align-items:center}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 14px var(--green)}.btn,.select{background:#102239;border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer}.btn:hover{border-color:var(--cyan)}
-.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:15px;margin-bottom:15px}.card{background:linear-gradient(145deg,rgba(16,34,56,.96),rgba(9,23,40,.96));border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:19px}.hero-card{min-height:285px;position:relative;overflow:hidden}.hero-card:after{content:'';position:absolute;right:-100px;bottom:-150px;width:420px;height:420px;border:1px solid rgba(85,214,208,.16);border-radius:50%;box-shadow:0 0 0 38px rgba(85,214,208,.025),0 0 0 78px rgba(85,214,208,.018)}.label{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:12px}.signal{display:flex;align-items:end;gap:24px;position:relative;z-index:1}.score{font:500 clamp(68px,9vw,112px)/.9 'DM Mono';letter-spacing:-.1em;color:var(--cyan)}.score small{font-size:19px;color:var(--muted);letter-spacing:0}.signal-title{font-size:24px;font-weight:700}.signal-copy p{font-size:12px;color:var(--muted);margin:5px 0 8px}.pill{display:inline-flex;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:700;color:var(--green);background:rgba(104,223,160,.1);border:1px solid rgba(104,223,160,.3)}.pill.warn{color:var(--amber);background:rgba(244,191,97,.1);border-color:rgba(244,191,97,.3)}.pill.danger{color:var(--red);background:rgba(255,116,134,.1);border-color:rgba(255,116,134,.3)}
-.meter{height:9px;background:#20334b;border-radius:99px;margin:28px 0 10px;overflow:hidden;position:relative;z-index:1}.meter i{display:block;height:100%;width:50%;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));border-radius:99px;transition:.7s}.scale{display:flex;justify-content:space-between;color:var(--muted);font:10px 'DM Mono'}.note{color:#7189a3;font-size:10px;margin-top:15px}
-.factor-list{display:grid;gap:11px}.factor{display:grid;grid-template-columns:1fr 72px 42px;gap:8px;align-items:center;font-size:12px}.factor small{display:block;color:var(--muted);font-size:10px}.bar{height:5px;background:#20334b;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px}.num{text-align:right;font:12px 'DM Mono'}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:15px}.span12{grid-column:span 12}.span8{grid-column:span 8}.span4{grid-column:span 4}.span6{grid-column:span 6}
-.section-title{font-size:16px;font-weight:700;margin:0}.section-note{font-size:11px;color:var(--muted);margin:3px 0 15px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}.search{min-width:220px;flex:1;background:#091827;border:1px solid #213650;border-radius:10px;padding:9px 11px;outline:none}.search:focus{border-color:var(--cyan)}
-.table-wrap{overflow:auto;max-height:680px;border:1px solid #1d334b;border-radius:12px}.stock-table{width:100%;border-collapse:collapse;min-width:940px}.stock-table th{position:sticky;top:0;background:#102239;color:#8ea6bf;font:10px 'DM Mono';text-align:right;padding:10px 9px;border-bottom:1px solid #28405a;z-index:2}.stock-table th:first-child,.stock-table th:nth-child(2){text-align:left}.stock-table td{padding:10px 9px;border-bottom:1px solid rgba(32,54,80,.62);font-size:12px;text-align:right}.stock-table td:first-child,.stock-table td:nth-child(2){text-align:left}.stock-table tr:hover{background:rgba(85,214,208,.045)}.rank{color:#6f87a1;font:11px 'DM Mono'}.name{font-weight:700}.ticker{font:10px 'DM Mono';color:#7088a1}.price{font:500 13px 'DM Mono'}.chg.up,.up{color:var(--red)}.chg.down,.down{color:#62d6ff}.flat{color:var(--amber)}.score-cell{font:700 13px 'DM Mono'}.action{font-weight:700}.buy{color:var(--green)}.watch{color:var(--amber)}.sell{color:var(--red)}
-.badge{display:inline-flex;padding:3px 7px;border-radius:999px;font-size:10px;border:1px solid #2a425c}.bgreen{color:var(--green);border-color:rgba(104,223,160,.3);background:rgba(104,223,160,.08)}.bamber{color:var(--amber);border-color:rgba(244,191,97,.3);background:rgba(244,191,97,.08)}.bred{color:var(--red);border-color:rgba(255,116,134,.3);background:rgba(255,116,134,.08)}
-.rankings{display:grid;gap:8px}.rank-row{display:grid;grid-template-columns:28px 1fr 55px 68px;gap:8px;align-items:center;padding:9px 10px;background:rgba(7,18,31,.5);border:1px solid #1e344d;border-radius:10px}.rank-row .r{font:11px 'DM Mono';color:#7890a9}.rank-row .s{font:700 12px 'DM Mono';text-align:right}.rank-row .a{text-align:right;font-size:11px}
-.tv{height:430px;border-radius:11px;overflow:hidden;background:#081624}.footer{margin-top:25px;border-top:1px solid var(--line);padding-top:15px;color:#70869e;font-size:10px}.source a{color:#8eb0d4}
-.detail-empty{padding:28px;color:var(--muted);text-align:center;border:1px dashed #2a4058;border-radius:12px}.detail-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.detail-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:14px}.detail-name{font-size:22px;font-weight:800}.detail-price{font:600 28px 'DM Mono'}.detail-change{font:600 15px 'DM Mono';margin-left:8px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.metric{background:#0d2035;border:1px solid #1c3650;border-radius:11px;padding:11px}.metric b{display:block;font:700 16px 'DM Mono';margin-top:5px}.metric small{color:var(--muted);font-size:10px}.reason-list{display:grid;gap:8px}.reason{display:flex;justify-content:space-between;padding:10px 11px;background:#0d2035;border:1px solid #1c3650;border-radius:10px;font-size:12px}.reason b{font-family:'DM Mono'}.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mini{background:#0d2035;border:1px solid #1c3650;border-radius:11px;padding:11px}.mini small{display:block;color:var(--muted);font-size:10px}.mini b{font:700 16px 'DM Mono';display:block;margin-top:5px}@media(max-width:700px){.metrics{grid-template-columns:1fr 1fr}.detail-grid{grid-template-columns:1fr}}@media(max-width:1000px){.hero{grid-template-columns:1fr}.span8,.span4,.span6{grid-column:span 12}}@media(max-width:600px){.wrap{padding:17px 12px 45px}header{display:block}.top{margin-top:12px;justify-content:space-between}.signal{gap:12px}.score{font-size:70px}.signal-title{font-size:19px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KOSPI 50 & Global Macro Investment Compass</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-yellow: #f59e0b;
+      --accent-red: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 16px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 16px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      color: var(--accent-blue);
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .temp-display {
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .temp-value {
+      font-size: 52px;
+      font-weight: 800;
+      color: var(--accent-blue);
+    }
+
+    .temp-status {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 8px;
+      color: var(--accent-yellow);
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 14px;
+    }
+
+    .metric-row:last-child {
+      border-bottom: none;
+    }
+
+    .tag-good { color: var(--accent-green); font-weight: bold; }
+    .tag-warn { color: var(--accent-yellow); font-weight: bold; }
+    .tag-danger { color: var(--accent-red); font-weight: bold; }
+
+    .widget-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .widget-card {
+      height: 400px;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      .temp-value { font-size: 40px; }
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <div>
-    <div class="eyebrow">KOREA STOCK COMPASS / KOSPI 50</div>
-    <div class="brand">오늘의 한국주식 온도계</div>
-    <div class="sub">한국 상위 50개 종목의 가격 흐름 + 거래대금 + 변동성 + 추세를 합산해 매수·관망·매도 참고지수를 계산합니다.</div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>KOSPI 50 & Macro Investment Compass</h1>
+      <p>글로벌 거시경제 지표 및 코스피 50 종목 수급 통합 투자 판단 대시보드</p>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="grid-main">
+      <!-- Card 1: Integrated Compass -->
+      <div class="card">
+        <div class="card-title">
+          <span>통합 투자 판단 온도계</span>
+          <span style="font-size: 11px; color: var(--accent-blue); font-weight: bold;">LIVE</span>
+        </div>
+        <div class="temp-display">
+          <div class="temp-value" id="overall-temp">56.5 ℃</div>
+          <div class="temp-status" id="overall-status">중립 (관망 & 분할매수)</div>
+        </div>
+        <p style="font-size: 12px; color: var(--text-sub); text-align: center; margin-top: 15px;">
+          * 거시경제(50%) + 코스피50 기술적 수급(50%) 가중 통합 결과
+        </p>
+      </div>
+
+      <!-- Card 2: Macro Monitor -->
+      <div class="card">
+        <div class="card-title"><span>1. 글로벌 거시경제 지표 (50%)</span></div>
+        <div class="metric-row">
+          <span>원/달러 환율 (USD/KRW)</span>
+          <span class="tag-warn" id="fx-val">1,345.5 원</span>
+        </div>
+        <div class="metric-row">
+          <span>미 10년물 국채금리</span>
+          <span class="tag-good" id="us10y-val">4.22 %</span>
+        </div>
+        <div class="metric-row">
+          <span>WTI 원유 가격</span>
+          <span class="tag-good" id="wti-val">$76.80</span>
+        </div>
+      </div>
+
+      <!-- Card 3: KOSPI50 Heat Monitor -->
+      <div class="card">
+        <div class="card-title"><span>2. KOSPI 50 내부 수급 온도 (50%)</span></div>
+        <div class="metric-row">
+          <span>20일선 상회 종목 비율</span>
+          <span class="tag-warn" id="ma20-ratio">54.0 % (27/50)</span>
+        </div>
+        <div class="metric-row">
+          <span>KOSPI 50 평균 RSI(14)</span>
+          <span class="tag-good" id="rsi-val">51.2 (중립)</span>
+        </div>
+        <div class="metric-row">
+          <span>외국인/기관 순매수 우위</span>
+          <span class="tag-warn" id="flow-val">혼조세</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TradingView Widgets Grid -->
+    <div class="widget-grid">
+      <!-- Chart 1: KOSPI Index -->
+      <div class="card widget-card">
+        <div class="card-title"><span>실시간 KOSPI 지수 차트</span></div>
+        <div id="tv-kospi" style="height: 340px;"></div>
+      </div>
+
+      <!-- Chart 2: USD/KRW Chart -->
+      <div class="card widget-card">
+        <div class="card-title"><span>실시간 원/달러 환율 차트</span></div>
+        <div id="tv-usdkrw" style="height: 340px;"></div>
+      </div>
+    </div>
   </div>
-  <div class="top"><div class="status"><i class="dot"></i><span id="status">데이터 연결 대기</span></div><button class="btn" id="refresh">↻ 새로고침</button></div>
-</header>
 
-<section class="hero">
-  <div class="card hero-card">
-    <div class="label"><span>한국주식 종합 판단지수 · KSI</span><span id="time" class="ticker">LIVE</span></div>
-    <div class="signal"><div id="overall" class="score">—<small>/100</small></div><div><div id="overallTitle" class="signal-title">데이터 분석 중</div><div id="overallText" class="signal-copy"><p>상위 50개 종목의 최신 시세를 불러오는 중입니다.</p></div><span id="overallPill" class="pill">계산 대기</span></div></div>
-    <div class="meter"><i id="meter"></i></div>
-    <div class="scale"><span>방어</span><span>중립</span><span>공격</span></div>
-    <div class="note">※ 본 지수는 투자 권유가 아니라 시장 환경을 빠르게 점검하기 위한 참고용 모델입니다. 국내 시세 제공사의 지연·이용조건 및 API 정책을 확인하세요.</div>
-  </div>
-  <div class="card">
-    <div class="label"><span>종합지수 구성</span><span class="ticker">가중치</span></div>
-    <div id="factors" class="factor-list"></div>
-  </div>
-</section>
+  <!-- TradingView Script Loading -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script type="text/javascript">
+    new TradingView.widget({
+      "autosize": true,
+      "symbol": "KRX:KOSPI",
+      "interval": "D",
+      "timezone": "Asia/Seoul",
+      "theme": "dark",
+      "style": "1",
+      "locale": "kr",
+      "container_id": "tv-kospi"
+    });
 
-<main class="grid">
-<section class="card span8">
-  <div class="label"><div><h2 class="section-title">KOSPI 50 종목 레이더</h2><p class="section-note">네이버 금융 실시간 시세를 기준으로 가격·등락률·거래대금을 표시합니다.</p></div><span id="dataSource" class="pill warn">NAVER 실시간</span></div>
-  <div class="toolbar">
-    <input id="search" class="search" placeholder="종목명 또는 코드 검색">
-    <select id="filter" class="select"><option value="all">전체 50</option><option value="buy">매수우위</option><option value="watch">관망</option><option value="sell">매도·방어</option></select>
-    <select id="sort" class="select"><option value="score">판단점수순</option><option value="chg">등락률순</option><option value="name">이름순</option><option value="rank">시총순</option></select>
-  </div>
-  <div class="table-wrap"><table class="stock-table"><thead><tr><th>#</th><th>종목</th><th>현재가</th><th>등락률</th><th>거래대금</th><th>추세</th><th>모멘텀</th><th>판단</th><th>액션</th></tr></thead><tbody id="rows"></tbody></table></div>
-</section>
-
-<section class="card span4">
-  <div class="label"><div><h2 class="section-title">오늘의 유망 종목 TOP 10</h2><p class="section-note">현재가 흐름을 중심으로 한 단기 참고 랭킹</p></div></div>
-  <div id="rankings" class="rankings"></div>
-</section>
-
-<section class="card span8">
-  <div class="label"><div><h2 class="section-title">선택 종목 정밀분석</h2><p class="section-note">종목을 클릭하면 추세·RSI·MACD·52주 위치·밸류에이션을 함께 계산합니다.</p></div><span id="detailStatus" class="pill warn">종목 선택</span></div>
-  <div id="detail" class="detail-empty">아래 종목표에서 종목을 클릭해 주세요.</div>
-</section>
-
-<section class="card span4">
-  <div class="label"><div><h2 class="section-title">시장 판단 레이더</h2><p class="section-note">현재 시세 + 기술적 지표를 단계적으로 반영합니다.</p></div></div>
-  <div id="marketMini" class="mini-grid"></div>
-  <div class="label" style="margin-top:18px"><div><h2 class="section-title">모델 설명</h2><p class="section-note">판단지수는 한 가지 지표에 의존하지 않습니다.</p></div></div>
-  <div class="factor-list">
-    <div class="factor"><span>가격 모멘텀<small>당일 등락률</small></span><span class="bar"><i style="width:30%;background:var(--cyan)"></i></span><span class="num">30%</span></div>
-    <div class="factor"><span>시장 breadth<small>상승 종목 비율</small></span><span class="bar"><i style="width:25%;background:var(--cyan)"></i></span><span class="num">25%</span></div>
-    <div class="factor"><span>거래대금<small>시장 관심도</small></span><span class="bar"><i style="width:20%;background:var(--cyan)"></i></span><span class="num">20%</span></div>
-    <div class="factor"><span>변동성<small>급등락 위험</small></span><span class="bar"><i style="width:15%;background:var(--cyan)"></i></span><span class="num">15%</span></div>
-    <div class="factor"><span>시장 리더십<small>상위 종목 동조화</small></span><span class="bar"><i style="width:10%;background:var(--cyan)"></i></span><span class="num">10%</span></div>
-  </div>
-  <div class="note">향후에는 실적 증가율·영업이익률·밸류에이션·외국인/기관 수급·52주 위치까지 추가하면 '유망종목' 판별력이 훨씬 좋아집니다.</div>
-</section>
-</main>
-<footer class="footer">
-  <b>Korea Stock Compass</b> · 시세: 네이버 금융 실시간 중계 · 기술지표: 일봉 데이터 계산
-</footer>
-</div>
-
-<script>
-const $=s=>document.querySelector(s);
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const API_BASE = (new URLSearchParams(location.search).get('api') || localStorage.getItem('KSI_API_BASE') || '').replace(/\/$/,'');
-const STOCKS=[
-['005930','삼성전자'],['000660','SK하이닉스'],['373220','LG에너지솔루션'],['207940','삼성바이오로직스'],['005380','현대차'],
-['068270','셀트리온'],['105560','KB금융'],['000270','기아'],['055550','신한지주'],['035420','NAVER'],
-['012330','현대모비스'],['028260','삼성물산'],['006400','삼성SDI'],['086790','하나금융지주'],['051910','LG화학'],
-['032830','삼성생명'],['066570','LG전자'],['003550','LG'],['034730','SK'],['096770','SK이노베이션'],
-['000810','삼성화재'],['033780','KT&G'],['017670','SK텔레콤'],['030200','KT'],['034020','두산에너빌리티'],
-['015760','한국전력'],['009150','삼성전기'],['010130','고려아연'],['011200','HMM'],['018260','삼성에스디에스'],
-['009540','HD한국조선해양'],['329180','HD현대중공업'],['267260','HD현대일렉트릭'],['010140','삼성중공업'],['028050','삼성엔지니어링'],
-['003490','대한항공'],['047050','포스코인터내셔널'],['005490','POSCO홀딩스'],['010950','S-Oil'],['011170','롯데케미칼'],
-['036570','엔씨소프트'],['251270','넷마블'],['035720','카카오'],['035250','강원랜드'],['004020','현대제철'],
-['000100','유한양행'],['088350','한화생명'],['000720','현대건설'],['161390','한국타이어앤테크놀로지'],['009830','한화솔루션']
-];
-let data=STOCKS.map((x,i)=>({code:x[0],name:x[1],rank:i+1,price:null,change:null,amount:null,score:null}));
-
-function calcScore(s){
-  const ch=Number(s.change)||0;
-  const momentum=Math.max(0,Math.min(100,50+ch*8));
-  const trend=Math.max(0,Math.min(100,50+ch*5));
-  const liquidity=s.amount?Math.max(25,Math.min(100,35+Math.log10(Math.max(1,s.amount))*8)):50;
-  return Math.round(momentum*.45+trend*.25+liquidity*.15+50*.15);
-}
-function action(score){return score>=68?'매수우위':score<=38?'매도·방어':'관망'}
-function cls(a){return a==='매수우위'?'buy':a==='매도·방어'?'sell':'watch'}
-function fmtPrice(v){return v==null?'—':Number(v).toLocaleString('ko-KR')}
-function fmtPct(v){if(v==null)return '—';return `${v>0?'+':''}${Number(v).toFixed(2)}%`}
-function fmtAmt(v){if(v==null)return '—';const n=Number(v);if(n>=1e12)return (n/1e12).toFixed(1)+'조';if(n>=1e8)return (n/1e8).toFixed(0)+'억';return n.toLocaleString('ko-KR')}
-
-function render(){
- const q=$('#search').value.trim().toLowerCase(), f=$('#filter').value, so=$('#sort').value;
- let arr=data.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.code.includes(q)));
- arr.forEach(s=>s.score=calcScore(s));
- if(f!=='all')arr=arr.filter(s=>cls(action(s.score))===f);
- arr.sort((a,b)=>so==='chg'?(b.change||-999)-(a.change||-999):so==='name'?a.name.localeCompare(b.name,'ko'):so==='rank'?a.rank-b.rank:(b.score||0)-(a.score||0));
- $('#rows').innerHTML=arr.map(s=>{
-  const a=action(s.score), c=cls(a);
-  return `<tr data-code="${s.code}" class="stock-row"><td class="rank">${s.rank}</td><td><div class="name">${esc(s.name)}</div><div class="ticker">${s.code}</div></td><td class="price">${fmtPrice(s.price)}</td><td class="chg ${s.change>0?'up':s.change<0?'down':'flat'}">${fmtPct(s.change)}</td><td>${fmtAmt(s.amount)}</td><td>${s.change==null?'—':(s.change>=1?'강함':s.change<=-1?'약함':'중립')}</td><td>${s.change==null?'—':(s.change>=2?'상승':s.change<=-2?'하락':'혼조')}</td><td class="score-cell ${c}">${s.score}</td><td class="action ${c}">${a}</td></tr>`;
- }).join('')||'<tr><td colspan="9" style="text-align:center;padding:25px;color:#8da4bd">조건에 맞는 종목이 없습니다.</td></tr>';
- document.querySelectorAll('.stock-row').forEach(r=>r.onclick=()=>loadDetail(r.dataset.code));
-
- const top=[...data].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,10);
- $('#rankings').innerHTML=top.map((s,i)=>`<div class="rank-row"><span class="r">${String(i+1).padStart(2,'0')}</span><span><b>${esc(s.name)}</b><small class="ticker"> ${s.code}</small></span><span class="s">${s.score??'—'}</span><span class="a ${cls(action(s.score||50))}">${action(s.score||50)}</span></div>`).join('');
-
- const valid=data.filter(s=>s.change!=null), avg=valid.length?valid.reduce((a,s)=>a+s.change,0)/valid.length:0, up=valid.filter(s=>s.change>0).length;
- const breadth=valid.length?up/valid.length*100:50, overall=Math.round(Math.max(0,Math.min(100,50+avg*7+(breadth-50)*.45)));
- $('#overall').innerHTML=`${valid.length?overall:'—'}<small>/100</small>`;$('#meter').style.width=(valid.length?overall:50)+'%';
- const title=overall>=68?'공격적 매수 환경':overall<=38?'방어·관망 환경':'중립 · 종목 선별';
- $('#overallTitle').textContent=valid.length?title:'데이터 연결 대기';
- $('#overallText').innerHTML=valid.length?`<p>상승 ${up} / ${valid.length} · 평균 등락률 ${fmtPct(avg)}</p>`:'<p>API 프록시를 연결하면 자동 계산됩니다.</p>';
- const pill=$('#overallPill');pill.textContent=valid.length?(overall>=68?'위험선호':overall<=38?'위험회피':'중립'):'계산 대기';pill.className='pill '+(overall<=38?'danger':overall<68?'warn':'');
- $('#factors').innerHTML=[
-  ['시장 breadth','상승 종목 비율',breadth,25],
-  ['가격 모멘텀','50종목 평균 등락',Math.max(0,Math.min(100,50+avg*8)),30],
-  ['거래대금','유동성/관심도',valid.length?65:50,20],
-  ['변동성','급등락 위험',valid.length?Math.max(0,100-Math.abs(avg)*18):50,15],
-  ['리더십','상위 종목 동조화',valid.length?60:50,10]
- ].map(x=>`<div class="factor"><span>${x[0]}<small>${x[1]} · ${x[3]}%</small></span><span class="bar"><i style="width:${x[2]}%;background:${x[2]>=65?'var(--green)':x[2]<=40?'var(--red)':'var(--amber)'}"></i></span><span class="num">${Math.round(x[2])}</span></div>`).join('');
- $('#marketMini').innerHTML=`<div class="mini"><small>상승 종목</small><b>${valid.length?up+' / '+valid.length:'—'}</b></div><div class="mini"><small>평균 등락률</small><b>${valid.length?fmtPct(avg):'—'}</b></div><div class="mini"><small>시장 분위기</small><b>${valid.length?(breadth>=65?'강세':breadth<=35?'약세':'혼조'):'—'}</b></div><div class="mini"><small>데이터 상태</small><b>${valid.length?'LIVE':'대기'}</b></div>`;
-}
-async function loadQuotes(){
- $('#status').textContent='시세 업데이트 중…';
- if(!API_BASE){ $('#status').textContent='Worker 주소가 설정되지 않았습니다'; updateApiState(false); render(); return; }
- try{
-   const codes=data.map(s=>s.code).join(',');
-   const r=await fetch(`${API_BASE}/quotes?codes=${encodeURIComponent(codes)}`,{cache:'no-store'});
-   if(!r.ok)throw Error(r.status);
-   const j=await r.json();
-   const map=new Map((j.items||[]).map(x=>[String(x.code),x]));
-   data.forEach(s=>{const q=map.get(s.code);if(q){s.price=q.price;s.change=q.change;s.amount=q.amount;}});
-   $('#dataSource').textContent=j.source||'NAVER PROXY';
-   $('#status').textContent='네이버 실시간 연결';
- }catch(e){
-   $('#status').textContent='시세 API 연결 실패 · 실제값만 표시';
-   data.forEach(s=>{s.price=null;s.change=null;s.amount=null});
- }
- render();$('#time').textContent=new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-}
-async function loadDetail(code){
- const s=data.find(x=>x.code===code); if(!s)return;
- $('#detailStatus').textContent=`${s.name} 분석 중`;
- $('#detail').innerHTML='<div class="detail-empty">기술지표와 밸류에이션을 계산하는 중입니다…</div>';
- try{
-  const r=await fetch(`${API_BASE}/detail?code=${code}`,{cache:'no-store'}); if(!r.ok)throw Error(r.status);
-  const j=await r.json(); const q=j.quote||s, m=j.metrics||{};
-  const score=j.score??s.score??50, a=action(score), c=cls(a);
-  $('#detailStatus').textContent=`${a} · ${score}점`;
-  $('#detailStatus').className='pill '+(c==='sell'?'danger':c==='watch'?'warn':'');
-  const pct=v=>v==null?'—':(Number(v)>0?'+':'')+Number(v).toFixed(2)+'%';
-  const n=v=>v==null?'—':Number(v).toLocaleString('ko-KR');
-  const val=v=>v==null?'—':Number(v).toFixed(2);
-  $('#detail').innerHTML=`<div class="detail-head"><div><div class="detail-name">${esc(s.name)} <span class="ticker">${s.code}</span></div><div class="ticker">${m.exchange||'KOSPI'} · ${m.updatedAt||''}</div></div><div><span class="detail-price">${n(q.price)}원</span><span class="detail-change ${q.change>=0?'up':'down'}">${pct(q.change)}</span></div></div><div class="metrics"><div class="metric"><small>5일 수익률</small><b>${pct(m.ret5)}</b></div><div class="metric"><small>20일 수익률</small><b>${pct(m.ret20)}</b></div><div class="metric"><small>RSI(14)</small><b>${val(m.rsi14)}</b></div><div class="metric"><small>MACD</small><b>${m.macdSignal||'—'}</b></div><div class="metric"><small>MA5 / MA20</small><b>${n(m.ma5)} / ${n(m.ma20)}</b></div><div class="metric"><small>52주 위치</small><b>${m.week52Pos==null?'—':m.week52Pos.toFixed(0)+'%'}</b></div><div class="metric"><small>PER / PBR</small><b>${val(m.per)} / ${val(m.pbr)}</b></div><div class="metric"><small>외국인 보유율</small><b>${pct(m.foreignRate)}</b></div></div><div class="detail-grid" style="margin-top:14px"><div class="reason-list"><div class="reason"><span>추세</span><b>${m.trend||'—'}</b></div><div class="reason"><span>거래대금</span><b>${fmtAmt(q.amount)}</b></div><div class="reason"><span>밸류에이션</span><b>${m.valuation||'—'}</b></div><div class="reason"><span>종합 판단</span><b class="${c}">${a}</b></div></div><div class="reason-list"><div class="reason"><span>판단점수</span><b>${score}/100</b></div><div class="reason"><span>단기 모멘텀</span><b>${m.momentum||'—'}</b></div><div class="reason"><span>52주 고가 / 저가</span><b>${n(m.high52)} / ${n(m.low52)}</b></div><div class="reason"><span>분석 근거</span><b>${m.reason||'시세 데이터 부족'}</b></div></div></div>`;
- }catch(e){ $('#detailStatus').textContent='분석 실패'; $('#detailStatus').className='pill danger'; $('#detail').innerHTML='<div class="detail-empty">정밀분석 데이터를 불러오지 못했습니다. 기본 현재가 데이터는 계속 표시됩니다.</div>'; }
-}
-function updateApiState(ok,msg){ const el=$('#apiState'); if(ok){el.textContent=msg||'실시간 연결';el.className='pill';} else {el.textContent=msg||'연결 주소 필요';el.className='pill warn';} }
-function testApi(){ const base=$('#apiInput').value.trim().replace(/\/$/,''); if(!base){updateApiState(false,'주소를 입력하세요');return;} fetch(base+'/index',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{localStorage.setItem('KSI_API_BASE',base);updateApiState(true,'Worker 연결 성공');$('#apiHelp').textContent='KOSPI '+(j?.item?.value??'—')+' · '+(j?.item?.change??'—')+'% 응답'; location.reload();}).catch(e=>{updateApiState(false,'Worker 연결 실패');$('#apiHelp').textContent='주소가 정확한지, Worker가 배포됐는지 확인하세요. 오류: '+e;}); }
-$('#apiInput').value=API_BASE;
-$('#saveApi').onclick=()=>{const base=$('#apiInput').value.trim().replace(/\/$/,''); if(!base){localStorage.removeItem('KSI_API_BASE');location.reload();return;} localStorage.setItem('KSI_API_BASE',base);location.reload();};
-$('#testApi').onclick=testApi;
-updateApiState(!!API_BASE, API_BASE?'설정됨':'연결 주소 필요');
-$('#refresh').onclick=loadQuotes;$('#search').oninput=render;$('#filter').onchange=render;$('#sort').onchange=render;
-render();loadQuotes();setInterval(loadQuotes,60000);
-</script>
+    new TradingView.widget({
+      "autosize": true,
+      "symbol": "FX_IDC:USDKRW",
+      "interval": "D",
+      "timezone": "Asia/Seoul",
+      "theme": "dark",
+      "style": "1",
+      "locale": "kr",
+      "container_id": "tv-usdkrw"
+    });
+  </script>
 </body>
 </html>
