@@ -93,7 +93,7 @@ header{display:flex;justify-content:space-between;gap:20px;align-items:flex-star
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const API_BASE = localStorage.getItem('KSI_API_BASE') || './api';
+const API_BASE = (new URLSearchParams(location.search).get('api') || localStorage.getItem('KSI_API_BASE') || '').replace(/\/$/,'');
 const STOCKS=[
 ['005930','삼성전자'],['000660','SK하이닉스'],['373220','LG에너지솔루션'],['207940','삼성바이오로직스'],['005380','현대차'],
 ['068270','셀트리온'],['105560','KB금융'],['000270','기아'],['055550','신한지주'],['035420','NAVER'],
@@ -154,6 +154,7 @@ function render(){
 }
 async function loadQuotes(){
  $('#status').textContent='시세 업데이트 중…';
+ if(!API_BASE){ $('#status').textContent='Worker 주소가 설정되지 않았습니다'; updateApiState(false); render(); return; }
  try{
    const codes=data.map(s=>s.code).join(',');
    const r=await fetch(`${API_BASE}/quotes?codes=${encodeURIComponent(codes)}`,{cache:'no-store'});
@@ -185,6 +186,12 @@ async function loadDetail(code){
   $('#detail').innerHTML=`<div class="detail-head"><div><div class="detail-name">${esc(s.name)} <span class="ticker">${s.code}</span></div><div class="ticker">${m.exchange||'KOSPI'} · ${m.updatedAt||''}</div></div><div><span class="detail-price">${n(q.price)}원</span><span class="detail-change ${q.change>=0?'up':'down'}">${pct(q.change)}</span></div></div><div class="metrics"><div class="metric"><small>5일 수익률</small><b>${pct(m.ret5)}</b></div><div class="metric"><small>20일 수익률</small><b>${pct(m.ret20)}</b></div><div class="metric"><small>RSI(14)</small><b>${val(m.rsi14)}</b></div><div class="metric"><small>MACD</small><b>${m.macdSignal||'—'}</b></div><div class="metric"><small>MA5 / MA20</small><b>${n(m.ma5)} / ${n(m.ma20)}</b></div><div class="metric"><small>52주 위치</small><b>${m.week52Pos==null?'—':m.week52Pos.toFixed(0)+'%'}</b></div><div class="metric"><small>PER / PBR</small><b>${val(m.per)} / ${val(m.pbr)}</b></div><div class="metric"><small>외국인 보유율</small><b>${pct(m.foreignRate)}</b></div></div><div class="detail-grid" style="margin-top:14px"><div class="reason-list"><div class="reason"><span>추세</span><b>${m.trend||'—'}</b></div><div class="reason"><span>거래대금</span><b>${fmtAmt(q.amount)}</b></div><div class="reason"><span>밸류에이션</span><b>${m.valuation||'—'}</b></div><div class="reason"><span>종합 판단</span><b class="${c}">${a}</b></div></div><div class="reason-list"><div class="reason"><span>판단점수</span><b>${score}/100</b></div><div class="reason"><span>단기 모멘텀</span><b>${m.momentum||'—'}</b></div><div class="reason"><span>52주 고가 / 저가</span><b>${n(m.high52)} / ${n(m.low52)}</b></div><div class="reason"><span>분석 근거</span><b>${m.reason||'시세 데이터 부족'}</b></div></div></div>`;
  }catch(e){ $('#detailStatus').textContent='분석 실패'; $('#detailStatus').className='pill danger'; $('#detail').innerHTML='<div class="detail-empty">정밀분석 데이터를 불러오지 못했습니다. 기본 현재가 데이터는 계속 표시됩니다.</div>'; }
 }
+function updateApiState(ok,msg){ const el=$('#apiState'); if(ok){el.textContent=msg||'실시간 연결';el.className='pill';} else {el.textContent=msg||'연결 주소 필요';el.className='pill warn';} }
+function testApi(){ const base=$('#apiInput').value.trim().replace(/\/$/,''); if(!base){updateApiState(false,'주소를 입력하세요');return;} fetch(base+'/index',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{localStorage.setItem('KSI_API_BASE',base);updateApiState(true,'Worker 연결 성공');$('#apiHelp').textContent='KOSPI '+(j?.item?.value??'—')+' · '+(j?.item?.change??'—')+'% 응답'; location.reload();}).catch(e=>{updateApiState(false,'Worker 연결 실패');$('#apiHelp').textContent='주소가 정확한지, Worker가 배포됐는지 확인하세요. 오류: '+e;}); }
+$('#apiInput').value=API_BASE;
+$('#saveApi').onclick=()=>{const base=$('#apiInput').value.trim().replace(/\/$/,''); if(!base){localStorage.removeItem('KSI_API_BASE');location.reload();return;} localStorage.setItem('KSI_API_BASE',base);location.reload();};
+$('#testApi').onclick=testApi;
+updateApiState(!!API_BASE, API_BASE?'설정됨':'연결 주소 필요');
 $('#refresh').onclick=loadQuotes;$('#search').oninput=render;$('#filter').onchange=render;$('#sort').onchange=render;
 render();loadQuotes();setInterval(loadQuotes,60000);
 </script>
