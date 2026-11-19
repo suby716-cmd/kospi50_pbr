@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KOSPI 50 & Global Macro Investment Compass</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-yellow: #f59e0b;
+      --accent-red: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0 0 24px 0;
+      line-height: 1.5;
+    }
+
+    /* 실시간 티커 전용 스타일 */
+    .ticker-container {
+      width: 100%;
+      background-color: #131722;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 16px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 16px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      color: var(--accent-blue);
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-sub);
+    }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .temp-display {
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .temp-value {
+      font-size: 52px;
+      font-weight: 800;
+      color: var(--accent-blue);
+    }
+
+    .temp-status {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 8px;
+      color: var(--accent-yellow);
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 14px;
+    }
+
+    .metric-row:last-child {
+      border-bottom: none;
+    }
+
+    .tag-good { color: var(--accent-green); font-weight: bold; }
+    .tag-warn { color: var(--accent-yellow); font-weight: bold; }
+    .tag-danger { color: var(--accent-red); font-weight: bold; }
+
+    .widget-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .widget-card {
+      height: 420px;
+    }
+
+    .table-card {
+      margin-top: 20px;
+      height: 600px;
+    }
+
+    @media (max-width: 600px) {
+      body { padding-bottom: 16px; }
+      .temp-value { font-size: 40px; }
+      .table-card { height: 500px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 0. Top Real-time Ticker Tape -->
+  <div class="ticker-container">
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+      {
+        "symbols": [
+          {"proName": "KRX:KOSPI", "title": "KOSPI 지수"},
+          {"proName": "FX_IDC:USDKRW", "title": "원/달러 환율"},
+          {"description": "삼성전자", "proName": "KRX:005930"},
+          {"description": "SK하이닉스", "proName": "KRX:000660"},
+          {"description": "LG에너지솔루션", "proName": "KRX:373220"},
+          {"description": "삼성바이오로직스", "proName": "KRX:207940"},
+          {"description": "현대차", "proName": "KRX:005380"},
+          {"description": "기아", "proName": "KRX:000270"}
+        ],
+        "showSymbolLogo": true,
+        "colorTheme": "dark",
+        "isTransparent": true,
+        "displayMode": "adaptive",
+        "locale": "kr"
+      }
+      </script>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>KOSPI 50 & Macro Investment Compass</h1>
+      <p>글로벌 거시경제 지표 및 코스피 50 주요 종목 실시간 수급·시세 모니터링</p>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="grid-main">
+      <!-- Card 1: Integrated Compass -->
+      <div class="card">
+        <div class="card-title">
+          <span>통합 투자 판단 온도계</span>
+          <span style="font-size: 11px; color: var(--accent-blue); font-weight: bold;">LIVE</span>
+        </div>
+        <div class="temp-display">
+          <div class="temp-value" id="overall-temp">56.5 ℃</div>
+          <div class="temp-status" id="overall-status">중립 (관망 & 분할매수)</div>
+        </div>
+        <p style="font-size: 12px; color: var(--text-sub); text-align: center; margin-top: 15px;">
+          * 거시경제(50%) + 코스피50 기술적 수급(50%) 가중 통합 결과
+        </p>
+      </div>
+
+      <!-- Card 2: Macro Monitor -->
+      <div class="card">
+        <div class="card-title"><span>1. 글로벌 거시경제 지표 (50%)</span></div>
+        <div class="metric-row">
+          <span>원/달러 환율 (USD/KRW)</span>
+          <span class="tag-warn" id="fx-val">1,345.5 원</span>
+        </div>
+        <div class="metric-row">
+          <span>미 10년물 국채금리</span>
+          <span class="tag-good" id="us10y-val">4.22 %</span>
+        </div>
+        <div class="metric-row">
+          <span>WTI 원유 가격</span>
+          <span class="tag-good" id="wti-val">$76.80</span>
+        </div>
+      </div>
+
+      <!-- Card 3: KOSPI50 Heat Monitor -->
+      <div class="card">
+        <div class="card-title"><span>2. KOSPI 50 내부 수급 온도 (50%)</span></div>
+        <div class="metric-row">
+          <span>20일선 상회 종목 비율</span>
+          <span class="tag-warn" id="ma20-ratio">54.0 % (27/50)</span>
+        </div>
+        <div class="metric-row">
+          <span>KOSPI 50 평균 RSI(14)</span>
+          <span class="tag-good" id="rsi-val">51.2 (중립)</span>
+        </div>
+        <div class="metric-row">
+          <span>외국인/기관 순매수 우위</span>
+          <span class="tag-warn" id="flow-val">혼조세</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TradingView Real-time Charts -->
+    <div class="widget-grid">
+      <!-- Chart 1: KOSPI Index -->
+      <div class="card widget-card">
+        <div class="card-title"><span>실시간 KOSPI 지수 차트</span></div>
+        <div id="tv-kospi" style="height: 360px;"></div>
+      </div>
+
+      <!-- Chart 2: USD/KRW Chart -->
+      <div class="card widget-card">
+        <div class="card-title"><span>실시간 원/달러 환율 차트</span></div>
+        <div id="tv-usdkrw" style="height: 360px;"></div>
+      </div>
+    </div>
+
+    <!-- Real-time KOSPI 50 Stocks Table -->
+    <div class="card table-card">
+      <div class="card-title">
+        <span>🔥 코스피 상위 핵심 종목 실시간 시세 및 변동률</span>
+        <span style="font-size: 11px; color: var(--accent-green); font-weight: bold;">실시간 연동</span>
+      </div>
+      <div class="tradingview-widget-container" style="height: calc(100% - 30px); width: 100%;">
+        <div class="tradingview-widget-container__widget" style="height: 100%; width: 100%;"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js" async>
+        {
+          "width": "100%",
+          "height": "100%",
+          "symbolsGroups": [
+            {
+              "name": "코스피 시가총액 상위 50 종목",
+              "originalName": "KOSPI 50",
+              "symbols": [
+                {"name": "KRX:005930", "displayName": "삼성전자"},
+                {"name": "KRX:000660", "displayName": "SK하이닉스"},
+                {"name": "KRX:373220", "displayName": "LG에너지솔루션"},
+                {"name": "KRX:207940", "displayName": "삼성바이오로직스"},
+                {"name": "KRX:005935", "displayName": "삼성전자우"},
+                {"name": "KRX:005380", "displayName": "현대차"},
+                {"name": "KRX:000270", "displayName": "기아"},
+                {"name": "KRX:068270", "displayName": "셀트리온"},
+                {"name": "KRX:105560", "displayName": "KB금융"},
+                {"name": "KRX:055550", "displayName": "신한지주"},
+                {"name": "KRX:035420", "displayName": "NAVER"},
+                {"name": "KRX:000810", "displayName": "삼성화재"},
+                {"name": "KRX:015760", "displayName": "한국전력"},
+                {"name": "KRX:035720", "displayName": "카카오"},
+                {"name": "KRX:006400", "displayName": "삼성SDI"},
+                {"name": "KRX:051910", "displayName": "LG화학"},
+                {"name": "KRX:012330", "displayName": "현대모비스"},
+                {"name": "KRX:028260", "displayName": "삼성물산"},
+                {"name": "KRX:032830", "displayName": "삼성생명"},
+                {"name": "KRX:086790", "displayName": "하나금융지주"},
+                {"name": "KRX:010140", "displayName": "삼성중공업"},
+                {"name": "KRX:009150", "displayName": "삼성전기"},
+                {"name": "KRX:034730", "displayName": "SK"},
+                {"name": "KRX:018260", "displayName": "삼성SDS"},
+                {"name": "KRX:003550", "displayName": "LX홀딩스"},
+                {"name": "KRX:036570", "displayName": "엔씨소프트"},
+                {"name": "KRX:010950", "displayName": "S-Oil"},
+                {"name": "KRX:011170", "displayName": "롯데케미칼"},
+                {"name": "KRX:001040", "displayName": "CJ"},
+                {"name": "KRX:004020", "displayName": "현대제철"}
+              ]
+            }
+          ],
+          "showSymbolLogo": true,
+          "isTransparent": true,
+          "colorTheme": "dark",
+          "locale": "kr"
+        }
+        </script>
+      </div>
+    </div>
+  </div>
+
+  <!-- TradingView Chart Script Loading -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script type="text/javascript">
+    new TradingView.widget({
+      "autosize": true,
+      "symbol": "KRX:KOSPI",
+      "interval": "D",
+      "timezone": "Asia/Seoul",
+      "theme": "dark",
+      "style": "1",
+      "locale": "kr",
+      "container_id": "tv-kospi"
+    });
+
+    new TradingView.widget({
+      "autosize": true,
+      "symbol": "FX_IDC:USDKRW",
+      "interval": "D",
+      "timezone": "Asia/Seoul",
+      "theme": "dark",
+      "style": "1",
+      "locale": "kr",
+      "container_id": "tv-usdkrw"
+    });
+  </script>
+</body>
+</html>
