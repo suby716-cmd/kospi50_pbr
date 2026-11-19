@@ -31,7 +31,10 @@ const sectors=[
 ['소재·금속','LIN SHW FCX NUE ECL NEM','005490 010130 051910 009830 001120 120110'],
 ['유틸리티·전력','NEE SO DUK CEG AEP VST','015760 036460 034020 267260 010120 298040'],
 ['부동산·리츠','PLD AMT EQIX WELL SPG O','395400 330590 293940 348950 088260 451800'],
-['배터리·전기화','ALB ENPH FSLR ON ETN FLNC','373220 006400 247540 086520 003670 361610']
+['배터리·전기화','ALB ENPH FSLR ON ETN FLNC','373220 006400 247540 086520 003670 361610'],
+['사이버보안','PANW CRWD FTNT ZS OKTA','053800 067920 136540'],
+['AI 바이오·신약개발','RXRX ABSI','388870 226330'],
+['디지털자산 인프라·보유','CRCL COIN MSTR BMNR','']
 ];
 const names={NVDA:'엔비디아',AMD:'AMD',AVGO:'브로드컴',TSM:'TSMC ADR',MU:'마이크론',AMAT:'어플라이드 머티어리얼즈',MSFT:'마이크로소프트',GOOGL:'알파벳',META:'메타',AMZN:'아마존',TSLA:'테슬라','005930':'삼성전자','000660':'SK하이닉스','042700':'한미반도체','403870':'HPSP','058470':'리노공업','240810':'원익IPS','005380':'현대차','000270':'기아','035420':'NAVER','035720':'카카오','373220':'LG에너지솔루션','005490':'POSCO홀딩스','207940':'삼성바이오로직스','068270':'셀트리온'};
 Object.assign(names,{
@@ -62,6 +65,8 @@ Object.assign(names,{
 const nodes=['AI·반도체','채권·현금','미국주식','한국주식','코인','부동산'];
 const benchmarks={US:'SPY',KR:'KOSPI'};
 const valid=n=>typeof n==='number'&&Number.isFinite(n);
+Object.assign(names,{PANW:'팔로알토 네트웍스',CRWD:'크라우드스트라이크',FTNT:'포티넷',ZS:'지스케일러',OKTA:'옥타','067920':'이글루코퍼레이션','136540':'윈스',RXRX:'리커전 파마슈티컬스',ABSI:'앱사이','388870':'파로스아이바이오','226330':'신테카바이오',CRCL:'써클',COIN:'코인베이스',MSTR:'스트래티지',BMNR:'비트마인'});
+const themeRoles={CRCL:'스테이블코인 발행',COIN:'거래·스테이블코인 유통',MSTR:'BTC 보유기업',BMNR:'ETH 보유기업'};
 const dateValid=date=>typeof date==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(date)&&Number.isFinite(Date.parse(date))&&new Date(date).toISOString().slice(0,10)===date;
 function normalize(payload){
  if(!payload||payload.schemaVersion!==1||typeof payload.asOf!=='string'||!dateValid(payload.asOf.slice(0,10))||typeof payload.source!=='string'||!payload.source.trim())throw Error('schemaVersion 1, asOf, source가 필요합니다.');
@@ -72,11 +77,11 @@ function normalize(payload){
   for(const row of rows){if(!Array.isArray(row))continue;const [date,close]=row;if(dateValid(date)&&valid(close)&&close>0&&date<=payload.asOf.slice(0,10))byDate.set(date,close);}
   series[id]=[...byDate].sort(([a],[b])=>a.localeCompare(b));
  }
- return {...payload,series,assets:Array.isArray(payload.assets)?payload.assets.filter(x=>x&&typeof x.id==='string'&&['US','KR'].includes(x.market)&&Number.isInteger(x.sector)&&x.sector>=0&&x.sector<13):[],flows:Array.isArray(payload.flows)?payload.flows.filter(Boolean):[],transfers:Array.isArray(payload.transfers)?payload.transfers.filter(Boolean):[]};
+ return {...payload,series,assets:Array.isArray(payload.assets)?payload.assets.filter(x=>x&&typeof x.id==='string'&&['US','KR'].includes(x.market)&&Number.isInteger(x.sector)&&x.sector>=0&&x.sector<sectors.length):[],flows:Array.isArray(payload.flows)?payload.flows.filter(Boolean):[],transfers:Array.isArray(payload.transfers)?payload.transfers.filter(Boolean):[]};
 }
 function sample(){
  const assets=[],series={},asOf='2026-11-19';
- for(const market of ['US','KR']) sectors.forEach(([_,us,kr],sector)=>(market==='US'?us:kr).split(' ').forEach((id,i)=>assets.push({id,market,sector,name:names[id]??id,roe:8+((sector*7+i*4)%18),fcf:1+i,debtEquity:.4+i*.16,earningsVolatility:.08+i*.025,cap:90-i*11,pbr:1.1+i*.33,pbrPercentile:13+i*13,turnover:1000+i})));
+ for(const market of ['US','KR']) sectors.forEach(([_,us,kr],sector)=>(market==='US'?us:kr).split(' ').filter(Boolean).forEach((id,i)=>assets.push({id,market,sector,name:names[id]??id,roe:8+((sector*7+i*4)%18),fcf:1+i,debtEquity:.4+i*.16,earningsVolatility:.08+i*.025,cap:90-i*11,pbr:1.1+i*.33,pbrPercentile:13+i*13,turnover:1000+i})));
  const keys=[...new Set([...assets.map(x=>x.id),'SPY','KOSPI','SOXX','TLT','VNQ','GOLD_US','GOLD_KR','COPPER_US','COPPER_KR',...['BTC','ETH','ONDO','UNI','AAVE','TAO','NEAR','XRP','XLM','HBAR','AVAX'].flatMap(x=>[x+'_US',x+'_KR'])])];
  keys.forEach((id,k)=>{let value=100+k/2;series[id]=[];for(let n=550;n>=0;n--){const ts=Date.parse(asOf)-n*86400000;const t=new Date(ts);if([0,6].includes(t.getUTCDay()))continue;const j=550-n;
  value*=1+.00055+Math.sin(j/17+k*.47)*.006+Math.sin(j/4+k)*.0035+Math.cos(j/57)*.0018;
@@ -142,7 +147,7 @@ const table=(heads,rows)=>'<div class="table-wrap"><table><thead><tr>'+heads.map
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}};
 const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const cards=items=>'<div class="grid">'+items.map(([label,value,detail])=>'<div class="panel"><small>'+label+'</small><div class="big">'+value+'</div><small>'+detail+'</small></div>').join('')+'</div>';
-const labels={overview:['시장 개요','미국·한국 주식의 장기 사이클과 글로벌 자금 흐름을 살펴봅니다.'],sectors:['섹터 랭킹','시장별 13개 섹터에서 품질 기준을 통과한 상위 5개 종목을 확인합니다.'],cycle:['장기 사이클','밸류에이션과 추세를 바탕으로 분할매집·보유·분할매도 조건을 점검합니다.'],rotation:['글로벌 자금순환','AI·반도체, 채권·현금, 미국·한국 주식, 코인, 부동산의 자금 흐름을 검증합니다.'],compare:['자산 비교','주식 대비 금·구리·코인 비율과 수익률 상관관계를 비교합니다.'],watch:['관심종목','체크한 주식을 시장별로 모아 확인합니다.'],crypto:['코인 컴퍼스','기존 MASTER MARKET COMPASS 코인 도구입니다.'],korea:['KOSPI 50 원본','첨부하신 kospi50_pbr의 시세 및 종목 화면입니다.'],settings:['데이터 설정','Worker와 데이터 스냅샷을 연결하고 계산 기준을 확인합니다.']};
+const labels={overview:['시장 개요','미국·한국 주식의 장기 사이클과 글로벌 자금 흐름을 살펴봅니다.'],sectors:['섹터 랭킹','시장별 16개 섹터·테마에서 최대 5개 종목을 확인합니다.'],cycle:['장기 사이클','밸류에이션과 추세를 바탕으로 분할매집·보유·분할매도 조건을 점검합니다.'],rotation:['글로벌 자금순환','AI·반도체, 채권·현금, 미국·한국 주식, 코인, 부동산의 자금 흐름을 검증합니다.'],compare:['자산 비교','주식 대비 금·구리·코인 비율과 수익률 상관관계를 비교합니다.'],watch:['관심종목','체크한 주식을 시장별로 모아 확인합니다.'],crypto:['코인 컴퍼스','기존 MASTER MARKET COMPASS 코인 도구입니다.'],korea:['KOSPI 50 원본','첨부하신 kospi50_pbr의 시세 및 종목 화면입니다.'],settings:['데이터 설정','Worker와 데이터 스냅샷을 연결하고 계산 기준을 확인합니다.']};
 let data=sample(),demo=true,market='US',sector=0,assetId='NVDA',days=90,indicator='GOLD',coin='BTC',chartMode='ratio',view='overview',status='',quote=null;
 let watched=new Set(read('mmc-watch',[])),settings=read('mmc-settings',{feed:'',kr:''});
 const candidates=(m=market,s=sector)=>data.assets.filter(a=>a.market===m&&a.sector===s);
@@ -172,15 +177,47 @@ function draw(lines,percent=false){
 }
 const canvas='<canvas class="chart" role="img" aria-label="선택 범위 시계열 차트"></canvas>';
 const rebased=rows=>{const v=rows[0]?.[1];return rows.map(([d,c])=>[d,c/v*100]);};
+let sectorQuoteUrl='', sectorQuotes=new Map(), sectorQuoteStatus='', sectorQuoteRequest=null;
+function loadSectorQuotes(ids){
+ const endpoint=settings.kr;
+ if(endpoint!==sectorQuoteUrl){
+  sectorQuoteUrl=endpoint;
+  sectorQuotes=new Map();
+  sectorQuoteStatus='';
+  sectorQuoteRequest=null;
+ }
+ if(!endpoint||!ids.length)return;
+ const key=endpoint+'|'+ids.join(',');
+ if(sectorQuoteRequest===key)return;
+ sectorQuoteRequest=key;
+ sectorQuoteStatus='시세 조회 중';
+ const batches=[];
+ for(let offset=0;offset<ids.length;offset+=20)batches.push(ids.slice(offset,offset+20));
+ Promise.allSettled(batches.map(async codes=>{
+  const url=new URL('/quotes',httpUrl(endpoint));
+  url.searchParams.set('codes',codes.join(','));
+  const response=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(12000)});
+  if(!response.ok)throw Error('시세 조회 실패');
+  const payload=await response.json();
+  if(!payload.ok||!Array.isArray(payload.items))throw Error('시세 자료 없음');
+  return payload.items.filter(q=>q&&codes.includes(q.code)&&valid(q.price)&&q.price>0);
+ })).then(results=>{
+  if(sectorQuoteRequest!==key)return;
+  sectorQuotes=new Map(results.flatMap(result=>result.status==='fulfilled'?result.value:[]).map(q=>[q.code,q]));
+  sectorQuoteStatus=sectorQuotes.size?'한국주식 시세 '+sectorQuotes.size+'/'+ids.length+'건 · NAVER Finance / Worker':'한국주식 시세 조회 실패';
+  if(view==='sectors'&&market==='KR')render();
+ });
+}
 function sectorStockList(top){
  const currency=market==='KR'?'KRW':'USD';
  const formatter=new Intl.NumberFormat('ko-KR',{style:'currency',currency});
  const header='<div class="sector-stock-line sector-stock-head" aria-hidden="true"><span>회사 · 종목코드</span><span>주가 ('+currency+')</span><span>내 관심</span></div>';
- if(!top.length)return '<span class="muted">편입 자료 없음</span>';
+ if(!top.length)return '<span class="muted">편입 종목 없음</span>';
  return header+'<ol class="sector-stock-list" aria-label="편입 종목">'+top.map((a,i)=>{
-  const latest=series(a.id).at(-1);
-  const price=latest?'<span title="조정 종가 '+esc(latest[0])+'">'+formatter.format(latest[1])+'</span>':'<span title="가격 결측">—</span>';
-  return '<li class="sector-stock-line"><button class="sector-stock-name" data-stock="'+esc(a.id)+'" data-sector="'+a.sector+'"><span class="sector-rank">'+(i+1)+'</span> '+name(a)+(a.name&&a.name!==a.id?' <small>'+esc(a.id)+'</small>':'')+'</button><span class="sector-price">'+price+'</span>'+watchButton(a)+'</li>';
+  const quote=market==='KR'?sectorQuotes.get(a.id):null;
+  const latest=demo?null:series(a.id).at(-1);
+  const price=quote?'<span title="NAVER Finance · '+esc(quote.updatedAt??'시세 시각 미제공')+'">'+formatter.format(quote.price)+'</span>':latest?'<span title="스냅샷 조정 종가 '+esc(latest[0])+'">'+formatter.format(latest[1])+'</span>':'<span title="실측 시세 없음">—</span>';
+  return '<li class="sector-stock-line"><button class="sector-stock-name" data-stock="'+esc(a.id)+'" data-sector="'+a.sector+'"><span class="sector-rank">'+(i+1)+'</span> '+name(a)+(a.name&&a.name!==a.id?' <small>'+esc(a.id)+'</small>':'')+(a.sector===15&&themeRoles[a.id]?' <small>· '+esc(themeRoles[a.id])+'</small>':'')+'</button><span class="sector-price">'+price+'</span>'+watchButton(a)+'</li>';
  }).join('')+'</ol>';
 }
 function stockRows(rows){
@@ -213,7 +250,9 @@ function render(){
   body+=panel('선택 섹터 상위 종목',stockRows(ranking(data.assets,market,sector).map((a,i)=>[a,i+1])));
  }
  if(view==='sectors'){
-  body+=panel('13개 섹터','<p class="muted">종목을 누르면 장기 사이클을 엽니다. 주가는 '+(demo?'합성 데모의 예시 금액입니다.':'선택 시장 통화로 표시한 최근 조정 종가입니다.')+'</p>'+table(['섹터','상위 5개 종목','편입 종목','평균 수익률','시장 대비'],sectors.map(([label],i)=>{const top=ranking(data.assets,market,i),rss=top.map(a=>stats(series(a.id),days));const vals=rss.map(r=>r.ret).filter(valid);const avg=top.length&&vals.length===top.length&&rss.every(r=>r.date===b.date)?vals.reduce((sum,x)=>sum+x,0)/vals.length:null;return ['<button data-pick="'+i+'">'+label+'</button>',sectorStockList(top),top.length+'/5',ret(avg),ret(valid(avg)&&valid(b.ret)?avg-b.ret:null)];})));
+  if(market==='KR')loadSectorQuotes([...new Set(sectors.flatMap((_,i)=>ranking(data.assets,market,i).map(a=>a.id)).filter(id=>/^\d{6}$/.test(id)))]);
+  const quoteNote=market==='KR'&&settings.kr?sectorQuoteStatus:demo?'실측 주가 미연결 · 데이터 설정에서 '+(market==='KR'?'한국주식 Worker 또는 실측 스냅샷':'실측 스냅샷')+'을 연결하세요.':'실측 스냅샷의 최근 조정 종가입니다.';
+  body+=panel('16개 섹터·테마','<p class="muted">종목을 누르면 장기 사이클을 엽니다. '+esc(quoteNote)+'</p>'+table(['섹터','상위 5개 종목','편입 종목','평균 수익률','시장 대비'],sectors.map(([label],i)=>{const top=ranking(data.assets,market,i),rss=top.map(a=>stats(series(a.id),days));const vals=rss.map(r=>r.ret).filter(valid);const avg=top.length&&vals.length===top.length&&rss.every(r=>r.date===b.date)?vals.reduce((sum,x)=>sum+x,0)/vals.length:null;return ['<button data-pick="'+i+'">'+label+'</button>',sectorStockList(top),top.length+'/5',ret(avg),ret(valid(avg)&&valid(b.ret)?avg-b.ret:null)];})));
   const top=ranking(data.assets,market,sector);
   const prior=data.priorRanks?.[market]?.[sector],ids=top.map(x=>x.id);
   const change=Array.isArray(prior)&&top.length?'편입 '+esc(ids.filter(x=>!prior.includes(x)).join(', ')||'없음')+' · 제외 '+esc(prior.filter(x=>!ids.includes(x)).join(', ')||'없음'):'편입·제외 비교 자료 부족';
@@ -244,7 +283,7 @@ function render(){
   chart=chartMode==='ratio'?[[rebased(selectedRows(ratio)),'#2457d6']]:corr.map((x,i)=>[selectedRows(x),['#2457d6','#0e986f','#ba3553'][i]]);
  }
  if(view==='watch'){
-  const rows=data.assets.filter(a=>a.market===market&&watched.has(a.market+'|'+a.id));
+  const rows=[...new Map(data.assets.filter(a=>a.market===market&&watched.has(a.market+'|'+a.id)).map(a=>[a.id,a])).values()];
   const missing=[...watched].filter(k=>k.startsWith(market+'|')&&!rows.some(a=>k===market+'|'+a.id));
   body+=panel('관심종목 · '+rows.length+'개',(rows.length?stockRows(rows.map(a=>[a])):'<p>섹터 랭킹에서 관심 체크를 하면 여기에 표시됩니다.</p>')+ (missing.length?'<p>현재 데이터에 없는 관심종목 '+missing.map(x=>esc(x.split('|')[1])).join(', ')+'</p>':''));
  }
